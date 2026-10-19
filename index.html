@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BMI</title>
+<meta name="theme-color" content="#0E7C86">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BMI">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7C86'/%3E%3Ctext x='16' y='21' font-size='12' font-weight='800' text-anchor='middle' fill='white' font-family='sans-serif'%3EBMI%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="ati" href="">
+<link rel="manifest" id="mf">
+<style>
+:root{--bg:#F2F5F7;--ink:#12263A;--mut:#5A6B7A;--acc:#0E7C86;--card:#fff;--ln:#D9E1E7}
+@media(prefers-color-scheme:dark){:root{--bg:#0E1A24;--ink:#E8EEF3;--mut:#9AABB9;--card:#15242F;--ln:#263847}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Naskh Arabic","Noto Sans Arabic",sans-serif;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+main{max-width:460px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:1.5rem;margin:0;font-weight:800;line-height:1.1}
+header p{margin:2px 0 0;color:var(--mut);font-size:.85rem}
+.seg{display:flex;background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:3px;flex:none}
+.seg button{border:0;background:none;color:var(--mut);font:inherit;font-size:.85rem;padding:6px 10px;border-radius:9px;min-height:36px}
+.seg button[aria-pressed=true]{background:var(--acc);color:#fff}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:16px;margin-top:14px}
+.units{margin-bottom:14px}.units .seg{display:grid;grid-template-columns:1fr 1fr}
+label{display:block;font-size:.9rem;color:var(--mut);margin-bottom:4px}
+.row{display:flex;gap:10px;margin-bottom:12px}.row>div{flex:1;min-width:0}
+input{width:100%;font:inherit;font-size:1.15rem;padding:12px;border:1px solid var(--ln);border-radius:12px;background:transparent;color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.go{width:100%;padding:14px;border:0;border-radius:14px;background:var(--acc);color:#fff;font:inherit;font-weight:700;font-size:1.05rem}
+.go:active{transform:scale(.98)}
+.err{color:#D23B3B;font-size:.9rem;min-height:1.3em;margin:6px 0 0}
+.res{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.num{font-size:4.2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cat{font-size:1.2rem;font-weight:700}
+.gw{position:relative;direction:ltr;margin:26px 0 4px}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%}
+.pin{position:absolute;top:-7px;left:0;width:4px;height:26px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .6s cubic-bezier(.2,.8,.2,1)}
+.tk{position:relative;height:20px;font-size:.75rem;color:var(--mut)}
+.tk span{position:absolute;transform:translateX(-50%)}
+.rng{margin:12px 0 0;color:var(--mut);font-size:.95rem}.rng b{color:var(--ink)}
+h2{font-size:1.05rem;margin:0 0 8px}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--ln)}
+li:first-child{border-top:0}
+li .d{width:10px;height:10px;border-radius:50%;flex:none}
+li .b{font-weight:700;font-variant-numeric:tabular-nums;min-width:3.2em}
+li .m{color:var(--mut);font-size:.85rem;margin-inline-start:auto;text-align:end}
+.ghost{background:none;border:1px solid var(--ln);color:var(--ink);border-radius:12px;padding:10px 14px;font:inherit;font-size:.9rem;min-height:44px}
+.foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.note{color:var(--mut);font-size:.8rem;margin:14px 2px 0}
+.ov{position:fixed;inset:0;background:#0009;display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sheet{background:var(--card);width:100%;max-width:460px;border-radius:20px 20px 0 0;padding:20px 20px max(20px,env(safe-area-inset-bottom))}
+.sheet ol{padding-inline-start:22px;margin:8px 0 14px}.sheet li{display:list-item;border:0;padding:4px 0}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><h1>BMI</h1><p data-i="sub"></p></div>
+  <div class="seg" id="langs" role="group" aria-label="Language">
+    <button data-l="en">EN</button><button data-l="ckb">کوردی</button><button data-l="ar">عربي</button>
+  </div>
+</header>
+
+<section class="card">
+  <div class="units"><div class="seg" role="group">
+    <button data-u="metric" data-i="metric"></button><button data-u="imperial" data-i="imperial"></button>
+  </div></div>
+  <div id="m">
+    <div class="row">
+      <div><label for="cm" id="lcm"></label><input id="cm" type="number" inputmode="decimal" min="50" max="272" placeholder="170"></div>
+      <div><label for="kg" id="lkg"></label><input id="kg" type="number" inputmode="decimal" min="2" max="500" placeholder="70"></div>
+    </div>
+  </div>
+  <div id="im">
+    <div class="row">
+      <div><label for="ft" id="lft"></label><input id="ft" type="number" inputmode="numeric" placeholder="5"></div>
+      <div><label for="inn" id="lin"></label><input id="inn" type="number" inputmode="decimal" placeholder="7"></div>
+      <div><label for="lb" id="llb"></label><input id="lb" type="number" inputmode="decimal" placeholder="154"></div>
+    </div>
+  </div>
+  <button class="go" id="go" data-i="calc"></button>
+  <p class="err" id="err" role="alert"></p>
+</section>
+
+<section class="card" id="res" hidden aria-live="polite">
+  <div class="res"><span class="num" id="num"></span><span class="cat" id="cat"></span></div>
+  <div class="gw">
+    <div class="bar"><i style="width:28.33%;background:#2F6FDE"></i><i style="width:21.67%;background:#1E9E5A"></i><i style="width:16.67%;background:#E08A00"></i><i style="width:33.33%;background:#D23B3B"></i></div>
+    <div class="pin" id="pin"></div>
+    <div class="tk"><span style="left:28.33%">18.5</span><span style="left:50%">25</span><span style="left:66.67%">30</span></div>
+  </div>
+  <p class="rng"><span data-i="rng"></span>: <b id="rv"></b></p>
+</section>
+
+<section class="card">
+  <h2 data-i="hist"></h2>
+  <ul id="hl"></ul>
+  <p class="note" id="none" data-i="none" style="margin:0"></p>
+  <div class="foot">
+    <button class="ghost" id="clr" data-i="clr"></button>
+    <button class="ghost" id="inst" data-i="inst" hidden></button>
+  </div>
+</section>
+
+<p class="note" data-i="note"></p>
+<p class="note" data-i="off" style="margin-top:4px"></p>
+</main>
+
+<div class="ov" id="ov" hidden>
+  <div class="sheet" role="dialog" aria-modal="true">
+    <h2 data-i="instT"></h2>
+    <ol><li data-i="s1"></li><li data-i="s2"></li><li data-i="s3"></li></ol>
+    <p class="note" data-i="s4" style="margin:0 0 14px"></p>
+    <button class="go" id="cl" data-i="close"></button>
+  </div>
+</div>
+
+<script>
+const T={
+en:{sub:'Body mass index calculator',h:'Height',w:'Weight',cm:'cm',kg:'kg',ft:'ft',inn:'in',lb:'lb',metric:'Metric',imperial:'Imperial',calc:'Calculate BMI',err:'Enter a valid height and weight.',rng:'Healthy weight for your height',hist:'History',clr:'Clear history',none:'Your saved results will appear here.',inst:'Install app',instT:'Add to Home Screen',s1:'Open this page in Safari.',s2:'Tap the Share button.',s3:'Choose Add to Home Screen, then Add.',s4:'On Android: open the browser menu and choose Install app.',close:'Done',note:'BMI is a screening guide, not a diagnosis. Ask a doctor about your health.',off:'Works offline. Your data stays on this phone.',c:['Underweight','Healthy weight','Overweight','Obesity']},
+ckb:{sub:'هەژمارکەری پێوەری گەورەیی لەش',h:'بەرزی',w:'کێش',cm:'سم',kg:'کگم',ft:'پێ',inn:'ئینج',lb:'پاوەند',metric:'مەتری',imperial:'ئینگلیزی',calc:'هەژمارکردنی BMI',err:'تکایە بەرزی و کێشێکی دروست بنووسە.',rng:'کێشی تەندروست بۆ بەرزییەکەت',hist:'مێژوو',clr:'سڕینەوەی مێژوو',none:'ئەنجامە پاشەکەوتکراوەکانت لێرە دەردەکەون.',inst:'دامەزراندنی ئەپ',instT:'زیادکردن بۆ شاشەی سەرەکی',s1:'ئەم پەڕەیە لە Safari بکەرەوە.',s2:'دوگمەی Share دابگرە.',s3:'Add to Home Screen هەڵبژێرە، پاشان Add.',s4:'لە ئەندرۆید: مینیۆی وێبگەڕ بکەرەوە و Install app هەڵبژێرە.',close:'تەواو',note:'BMI تەنها ڕێنمایییەکی پشکنینە و دیاریکردنی نەخۆشی نییە. بۆ تەندروستیت پرسیار لە پزیشک بکە.',off:'بێ ئینتەرنێت کاردەکات. داتاکانت لەسەر ئەم مۆبایلە دەمێننەوە.',c:['کێشی کەم','کێشی تەندروست','کێشی زیاد','قەڵەوی']},
+ar:{sub:'حاسبة مؤشر كتلة الجسم',h:'الطول',w:'الوزن',cm:'سم',kg:'كغ',ft:'قدم',inn:'بوصة',lb:'رطل',metric:'متري',imperial:'إمبراطوري',calc:'احسب BMI',err:'أدخل طولًا ووزنًا صحيحين.',rng:'الوزن الصحي لطولك',hist:'السجل',clr:'مسح السجل',none:'ستظهر نتائجك المحفوظة هنا.',inst:'تثبيت التطبيق',instT:'إضافة إلى الشاشة الرئيسية',s1:'افتح هذه الصفحة في Safari.',s2:'اضغط على زر المشاركة.',s3:'اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».',s4:'على أندرويد: افتح قائمة المتصفح واختر «تثبيت التطبيق».',close:'تم',note:'مؤشر كتلة الجسم دليل فحص وليس تشخيصًا. استشر طبيبًا بشأن صحتك.',off:'يعمل بدون إنترنت. تبقى بياناتك على هذا الهاتف.',c:['نقص الوزن','وزن صحي','زيادة الوزن','سمنة']}
+};
+const COL=['#2F6FDE','#1E9E5A','#E08A00','#D23B3B'];
+const $=id=>document.getElementById(id);
+let st={lang:'en',unit:'metric',hist:[],v:{}},cur=null;
+try{Object.assign(st,JSON.parse(localStorage.getItem('bmi.s')||'{}'))}catch(e){}
+if(!localStorage.getItem('bmi.s')){const n=(navigator.language||'en').toLowerCase();st.lang=n.startsWith('ar')?'ar':(n.startsWith('ckb')||n.startsWith('ku'))?'ckb':'en'}
+const sv=()=>{try{localStorage.setItem('bmi.s',JSON.stringify(st))}catch(e){}};
+const L=()=>T[st.lang];
+const cat=b=>b<18.5?0:b<25?1:b<30?2:3;
+
+function ui(){
+  const t=L();
+  document.documentElement.lang=st.lang;
+  document.documentElement.dir=st.lang==='en'?'ltr':'rtl';
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t[e.dataset.i]);
+  $('lcm').textContent=t.h+' ('+t.cm+')';$('lkg').textContent=t.w+' ('+t.kg+')';
+  $('lft').textContent=t.h+' ('+t.ft+')';$('lin').textContent=t.inn;$('llb').textContent=t.w+' ('+t.lb+')';
+  document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===st.lang));
+  document.querySelectorAll('[data-u]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.u===st.unit));
+  $('m').hidden=st.unit!=='metric';$('im').hidden=st.unit!=='imperial';
+  if(cur)show(cur.b,cur.h,cur.w);
+  list();
+}
+function wtxt(kg){return st.unit==='metric'?kg.toFixed(1)+' '+L().kg:(kg*2.2046226).toFixed(0)+' '+L().lb}
+function show(b,h,w){
+  cur={b,h,w};const c=cat(b),m=h/100;
+  $('res').hidden=false;
+  $('num').textContent=b.toFixed(1);
+  $('cat').textContent=L().c[c];$('cat').style.color=COL[c];
+  $('pin').style.left=Math.min(1,Math.max(0,(b-10)/30))*100+'%';
+  $('rv').textContent=wtxt(18.5*m*m).replace(/ .*/,'')+' – '+wtxt(24.9*m*m);
+}
+function list(){
+  const ul=$('hl');ul.innerHTML='';
+  st.hist.forEach(r=>{
+    const li=document.createElement('li');
+    const d=new Date(r.t).toLocaleDateString(st.lang==='en'?'en-GB':st.lang,{day:'numeric',month:'short'});
+    li.innerHTML='<span class="d" style="background:'+COL[cat(r.b)]+'"></span><span class="b">'+r.b.toFixed(1)+'</span><span>'+L().c[cat(r.b)]+'</span><span class="m">'+wtxt(r.w)+' · '+d+'</span>';
+    ul.appendChild(li);
+  });
+  $('none').hidden=st.hist.length>0;$('clr').hidden=!st.hist.length;
+}
+function calc(){
+  const v=id=>parseFloat($(id).value);let h,w;
+  if(st.unit==='metric'){h=v('cm');w=v('kg')}
+  else{h=((v('ft')||0)*12+(v('inn')||0))*2.54;w=v('lb')/2.2046226}
+  if(!(h>=50&&h<=272&&w>=2&&w<=500)){$('err').textContent=L().err;$('res').hidden=true;cur=null;return}
+  $('err').textContent='';
+  const m=h/100,b=w/(m*m);
+  show(b,h,w);
+  const last=st.hist[0];
+  if(!last||Math.abs(last.b-b)>0.04||Date.now()-last.t>60000){
+    st.hist.unshift({t:Date.now(),b,w});st.hist=st.hist.slice(0,30);
+  }
+  sv();list();
+}
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{st.lang=b.dataset.l;sv();ui()});
+document.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{st.unit=b.dataset.u;sv();ui()});
+['cm','kg','ft','inn','lb'].forEach(id=>{$(id).value=st.v[id]||'';$(id).addEventListener('input',()=>{st.v[id]=$(id).value;sv()})});
+$('go').onclick=calc;
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT')calc()});
+$('clr').onclick=()=>{st.hist=[];sv();list()};
+
+/* Install */
+let dp=null;
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if(!standalone)$('inst').hidden=false;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e});
+addEventListener('appinstalled',()=>{$('inst').hidden=true});
+$('inst').onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null}else $('ov').hidden=false};
+$('cl').onclick=()=>$('ov').hidden=true;
+$('ov').onclick=e=>{if(e.target===$('ov'))$('ov').hidden=true};
+
+/* Icons + manifest (generated, so no extra files are needed) */
+function icon(s){
+  const c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');
+  x.fillStyle='#0E7C86';x.fillRect(0,0,s,s);
+  const bw=s*.52,bx=(s-bw)/2,by=s*.68,bh=s*.06,w=[.2833,.2167,.1667,.3333];let px=bx;
+  w.forEach((f,i)=>{x.fillStyle=COL[i];x.fillRect(px,by,bw*f,bh);px+=bw*f});
+  x.fillStyle='#fff';x.fillRect(bx+bw*.46,by-s*.04,s*.018,bh+s*.08);
+  x.font='800 '+s*.30+'px system-ui,-apple-system,sans-serif';x.textAlign='center';x.textBaseline='alphabetic';
+  x.fillText('BMI',s/2,s*.55);
+  return c.toDataURL('image/png');
+}
+try{
+  const i180=icon(180),i192=icon(192),i512=icon(512);
+  $('ati').href=i180;
+  const base=location.href.split('#')[0].split('?')[0];
+  const mf={name:'BMI Calculator',short_name:'BMI',start_url:base,scope:base.slice(0,base.lastIndexOf('/')+1),display:'standalone',background_color:'#F2F5F7',theme_color:'#0E7C86',
+    icons:[{src:i192,sizes:'192x192',type:'image/png',purpose:'any'},{src:i512,sizes:'512x512',type:'image/png',purpose:'any'},{src:i512,sizes:'512x512',type:'image/png',purpose:'maskable'}]};
+  $('mf').href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}));
+}catch(e){}
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+ui();
+</script>
+</body>
+</html>
